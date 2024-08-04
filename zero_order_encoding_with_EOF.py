@@ -7,57 +7,6 @@ golden_ratio=0.6180339887498948482045868343656381177203091798057628621354486227
 
 
 
-# Hufmann Coding, written by ChatGPT, modified by me
-
-class NodeTree(object):
-    def __init__(self, left=None, right=None):
-        self.left = left
-        self.right = right
-
-    def children(self):
-        return self.left, self.right
-
-    def __str__(self):
-        return self.left, self.right
-
-
-def huffman_code_tree(node, binString=''):
-    '''
-    Function to find Huffman Code
-    '''
-    if type(node) is str:
-        return {node: binString}
-    (l, r) = node.children()
-    d = {}
-    d.update(huffman_code_tree(l, binString + '10'))
-    d.update(huffman_code_tree(r, binString + '0'))
-    return d
-
-
-def make_tree(nodes):
-    '''
-    Function to make tree
-    :param nodes: Nodes
-    :return: Root of the tree
-    '''
-    while len(nodes) > 1:
-        (key1, c1) = nodes[-1]
-        (key2, c2) = nodes[-2]
-        nodes = nodes[:-2]
-        node = NodeTree(key1, key2)
-        nodes.append((node, c1 + c2))
-        nodes = sorted(nodes, key=lambda x: x[1], reverse=True)
-    return nodes[0][0]
-
-def MC_Huffmann_encoder(word, encoding):
-
-    string=word
-
-    encoded=""
-    for k in range(len(string)):
-        encoded+=str(encoding[string[k]])
-    return encoded
-# end of MC Huffmann coding
 
 def one_time_last_character_encoder_MC( whole,s,a,b,altta_0_mı_var,ustte_1_mi_var,s_üst,s_alt  ):
     half = whole / 2
