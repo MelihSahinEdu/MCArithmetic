@@ -1,0 +1,601 @@
+import sys
+import math
+import random
+main_condition=False
+sys.setrecursionlimit(2500)
+from zero_order_encoding_with_EOF import *
+
+
+
+def classical_one_time_last_character_encoder_MC_with_eof(whole, s, a, b, altta_0_mı_var, ustte_1_mi_var, s_üst, s_alt):
+    half = whole / 2
+
+    emit = []
+
+    while (True):
+
+        if (s>0):
+            if ((not altta_0_mı_var) and (not ustte_1_mi_var)):
+
+                if ((a==0 and b>=half) or (b==whole and a<half)):
+                    if ((b==whole and a<half)):
+                        emit.append(s_üst)
+
+                        for t in range(s - 1):
+                            emit.append(0)
+
+
+
+                        emit.append(0)
+                        break
+
+                    if ((a==0 and b>=half)):
+                        emit.append(s_alt)
+
+                        for t in range(s - 1):
+                            emit.append(1)
+
+
+                        emit.append(1)
+
+                        break
+
+
+                else:
+                    a_nın = half - a
+                    b_nin = b - half
+
+                    if (a_nın>=b_nin):
+                        emit.append(s_alt)
+
+                        for t in range(s - 1):
+                            emit.append(1)
+
+
+                        emit.append(1)
+
+
+                        s = 0
+
+                        b = whole
+                        a = int((a*whole)/half)
+
+                        if (a>=half):
+                            emit.append(1)
+
+                            break
+
+                    else:
+                        emit.append(s_üst)
+
+                        for t in range(s - 1):
+                            emit.append(0)
+
+                        s = 0
+
+                        emit.append(0)
+
+                        a = 0
+                        b = int(((b-half)*whole)/((whole-half)))
+
+                        if (b<half):
+                            emit.append(0)
+                            break
+
+
+                    altta_0_mı_var = True
+                    ustte_1_mi_var = True
+
+
+
+
+
+
+        else: # s is 0
+
+
+            if (altta_0_mı_var and ustte_1_mi_var):
+                if ((a==0 and b>=half) or (b==whole and a<half)):
+
+                    if (b==whole and a<half):
+                        emit.append(1)
+
+                        break
+
+                    else:
+                        emit.append(0)
+                        break
+
+                else:
+
+
+                    a_nın=half-a
+                    b_nin=b-half
+
+
+
+                    if (a_nın>=b_nin):
+                        emit.append(0)
+                        b=whole
+                        a=int((a*whole)/half)
+
+                    else:
+
+
+                        emit.append(1)
+
+                        a=0
+                        b=int(((b-half)*whole)/half)
+
+
+
+
+
+            elif ((not altta_0_mı_var) and (not ustte_1_mi_var)):
+                if (a==0 and b>=half) or (b==whole and a<half):
+                    if  (b==whole and a<half):
+                        emit.append(0)
+                        break
+
+
+                    else:
+                        emit.append(1)
+
+                        break
+
+                else:
+
+                    a_nın=half-a
+                    b_nin=b-half
+
+                    if (a_nın>=b_nin):
+
+                        emit.append(1)
+
+                        b = whole
+                        a = int((a * whole) / half)
+
+                    else:
+                        emit.append(0)
+
+                        a=0
+                        b = int(((b - half) * whole) / half)
+
+                    altta_0_mı_var=True
+                    ustte_1_mi_var=True
+
+    return emit
+
+def classical_one_time_encoder_MC_with_eof(whole, c, d, dict, s, a, b, the_character, altta_0_mı_var, ustte_1_mi_var, s_üst, s_alt):
+
+    half=whole/2
+    zero_length = half
+    one_length = whole - 0
+
+    emit=[]
+
+
+    s_teki_artış=0
+    saf_artış=0
+
+    if (True):
+
+
+
+
+        our_char=the_character
+        word_number=dict[our_char]
+
+        w = b - a
+        fake_a = a
+        a = a + int((c[word_number] * w) / whole)
+        b = fake_a + int((d[word_number] * w) / whole)
+
+
+
+        if (s==0):
+
+            if ((not altta_0_mı_var) and (not ustte_1_mi_var)):
+                if (b<half or a>=half):
+                    if (b<half):
+                        emit.append(1)
+                        saf_artış += 1
+
+
+                        a=int((a*(whole))/half)
+                        b=int((b*(whole))/half)
+
+
+
+                    else:
+                        emit.append(0)
+                        saf_artış += 1
+                        a=int(((a-half)*(whole))/half)
+                        b=int(((b-half)*(whole))/half)
+
+
+
+
+                    altta_0_mı_var=True
+                    ustte_1_mi_var=True
+
+            if (altta_0_mı_var and ustte_1_mi_var):
+                while (b<half or a>=half):
+                    if (b<half):
+                        emit.append(0)
+
+                        saf_artış += 1
+                        a = int((a * (whole)) / half)
+                        b = int((b * (whole)) / half)
+
+
+
+
+
+                    else:
+                        emit.append(1)
+                        saf_artış += 1
+
+                        a=int(((a-half)*(whole))/half)
+                        b=int(((b-half)*(whole))/half)
+
+
+
+        if (s>0):
+            if (altta_0_mı_var and ustte_1_mi_var):
+                # buraya gelmesi mantıken imkansız
+                pass
+
+            if ((not altta_0_mı_var) and (not ustte_1_mi_var)):
+                if (b<half or a>=half):
+                    if (b<half):
+
+                        a=int((a*(whole))/half)
+                        b=int((b*(whole))/half)
+
+
+
+                        emit.append(s_alt)
+
+                        for t in range(s - 1):
+                            emit.append(1)
+
+
+
+                        s = 0
+
+
+
+
+                        emit.append(1)
+                        saf_artış += 1
+
+
+
+
+                    else: #üste gelirse 0000
+
+                        emit.append(s_üst)
+
+                        for t in range(s-1):
+                            emit.append(0)
+
+
+                        s=0
+
+
+                        emit.append(0)
+                        saf_artış += 1
+
+
+                        a=int(((a-half)*(whole))/half)
+                        b=int(((b-half)*(whole))/half)
+
+
+
+
+                    altta_0_mı_var=True
+                    ustte_1_mi_var=True
+
+
+            if (altta_0_mı_var and ustte_1_mi_var):
+                while (b<half or a>=half):
+                    if (b<half):
+                        emit.append(0)
+                        saf_artış += 1
+                        a = int((a * (whole)) / half)
+                        b = int((b * (whole)) / half)
+
+
+
+
+                    else:
+                        emit.append(1)
+                        saf_artış += 1
+
+
+                        a=int(((a-half)*(whole))/half)
+                        b=int(((b-half)*(whole))/half)
+
+
+
+
+        # phi:=1/golden_ratio
+        condition = True
+        while (condition):
+            if (altta_0_mı_var and ustte_1_mi_var):
+                if (b < int(whole*(3/4)) and a>=int(whole*(1/4))):  # 648056=whole*phi*phi
+
+
+                    condition = True
+                    a = int(((a - int(whole*(1/4))) * (whole)) / (whole/2))
+                    b = int(((b - int(whole*(1/4))) * (whole)) / (whole/2))
+
+
+                    if (s == 0):
+                        s_üst = 1
+                        s_alt = 0
+
+                    s += 1
+                    s_teki_artış += 1
+
+
+                    altta_0_mı_var = False
+                    ustte_1_mi_var = False
+
+
+                else:
+                    condition = False
+
+            if ((not altta_0_mı_var) and (not ustte_1_mi_var)):
+
+                if (b < int(whole*(3/4)) and a>=int(whole*(1/4))):  # 801041=whole*(2*(phi*phi))
+                    a = int(((a - int(whole * (1 / 4))) * (whole)) / (whole / 2))
+                    b = int(((b - int(whole * (1 / 4))) * (whole)) / (whole / 2))
+
+                    if (s == 0):
+                        s_üst = 0
+                        s_alt = 1
+
+                    s += 1
+                    s_teki_artış += 1
+
+                    altta_0_mı_var = False
+                    ustte_1_mi_var = False
+
+
+
+
+                else:
+                    condition = False
+
+
+    return emit, s, a, b, altta_0_mı_var, ustte_1_mi_var, s_alt, s_üst, s_teki_artış,saf_artış
+
+
+def classical_decoder_with_eof(whole, sequence, c, d, dict, chars, number, number_finish, altta_0_mı_var, ustte_1_mi_var, the_seqeunce, s_üst, s_alt, s, is_s_0, toplam_emit, main_condition, kaçıncı):
+
+    zero_length = int(whole/2)
+    one_length = int(whole/2)
+
+    the_character=0
+
+
+
+    number_finish_now=whole
+    number_now=0
+
+    j=0
+    last_index=min(20,len(sequence))  # 20 can be modified
+
+    if (len(sequence) == 0):
+        return the_seqeunce, sequence
+
+    if (altta_0_mı_var and ustte_1_mi_var):
+        pass
+
+    elif (not altta_0_mı_var and not ustte_1_mi_var):
+        if sequence[0]==0:
+            number_now=one_length
+        else:
+            number_finish_now=one_length
+
+        j += 1
+    else:
+        print("GRAVE ERROR")
+        return the_seqeunce, sequence
+
+
+
+    while j<last_index:
+
+        if sequence[j]==0:
+            number_finish_now=number_now + round(((number_finish_now-number_now)*zero_length)/whole)
+        else:
+            number_now=number_now + round(((number_finish_now-number_now)*zero_length)/whole)
+        j+=1
+
+
+
+    final_number=(number_now+number_now)/2
+
+
+
+
+    for h in range(len(chars)):
+        lower_bound=int((c[dict[chars[h]]]*(number_finish-number))/whole)+number
+        upper_bound=int((d[dict[chars[h]]]*(number_finish-number))/whole)+number
+
+
+        if ( final_number<upper_bound): # z'nin yani number_now'ın çok düşük olduğunu farzet
+            the_seqeunce.append(chars[h])
+            the_character=chars[h]
+            if (h==len(chars)-1): # len(chars)-1 is EOF index
+                emit, s, number, number_finish, altta_0_mı_var, ustte_1_mi_var, s_alt, s_üst, s_teki_artış, saf_artış = classical_one_time_encoder_MC_with_eof(whole, c, d, dict, s, number, number_finish, the_character, altta_0_mı_var, ustte_1_mi_var, s_üst, s_alt)
+                sequence = sequence[(saf_artış) + (s_teki_artış):]
+                encoded=classical_one_time_last_character_encoder_MC_with_eof(whole, s, number, number_finish, altta_0_mı_var, ustte_1_mi_var, s_üst, s_alt)
+                sequence=sequence[len(encoded)-s_teki_artış:]
+                return the_seqeunce, sequence
+            break
+        if h==len(chars)-1: # şu anki durumuyla buraya asla gelmeyecek,
+            print("************************")
+            print("hata")
+            return the_seqeunce, sequence # hata çıktı
+
+    emit, s, number, number_finish,  altta_0_mı_var, ustte_1_mi_var, s_alt, s_üst,s_teki_artış,saf_artış=classical_one_time_encoder_MC_with_eof(whole, c, d, dict, s, number, number_finish, the_character, altta_0_mı_var, ustte_1_mi_var, s_üst, s_alt)
+
+    sequence = sequence[(saf_artış)+(s_teki_artış):]
+
+
+
+
+    kaçıncı+=1
+    return classical_decoder_with_eof(whole, sequence, c, d, dict, chars, number, number_finish, altta_0_mı_var, ustte_1_mi_var, the_seqeunce, s_üst, s_alt, s, s == 0, toplam_emit, main_condition, kaçıncı)
+
+def classical_zero_order_encoder_MC_with_eof( whole, word, c, d, dict):
+    a=0
+    b=whole
+    s=0
+    altta_0_mı_var=True
+    ustte_1_mi_var=True
+    s_üst=1
+    s_alt=0
+    emit=[]
+    for i in range(len(word)):
+        the_character=word[i]
+        emit_new, s, a, b, altta_0_mı_var, ustte_1_mi_var, s_alt, s_üst, s_teki_artış, saf_artış = classical_one_time_encoder_MC_with_eof(whole, c, d, dict, s, a, b, the_character, altta_0_mı_var, ustte_1_mi_var, s_üst, s_alt)
+        emit+=emit_new
+    emit+=classical_one_time_last_character_encoder_MC_with_eof(whole, s, a, b, altta_0_mı_var, ustte_1_mi_var, s_üst, s_alt)
+    return emit
+
+
+def random_zero_order_text_generator_with_eof(chars, rates_raw, word_length):
+    new_total_number=sum(rates_raw)-rates_raw[len(rates_raw)-1]
+    rates_raw.pop()
+    for u in range(len(rates_raw)):
+        rates_raw[u]=rates_raw[u]/new_total_number
+    d = [rates_raw[0]]
+    for r in range(len(rates_raw) - 1):
+        d.append(d[r] + rates_raw[r + 1])
+    the_word=[]
+    for t in range(word_length):
+        sayı = random.uniform(0, 1)
+        the_char = 0
+        for j in range(len(d)):
+            if sayı<=d[j]:
+                the_char=chars[j]
+                break
+        the_word.append(the_char)
+    the_word.append(chars[len(chars)-1])
+    return "".join(the_word)
+
+
+def zero_order_dict_c_d_returner(chars, rates_raw, bit_precision):
+    whole = 2 ** bit_precision
+    dict = {}
+    for v in range(len(chars)):
+        dict.update({chars[v]: v})
+
+    rates = []
+    for u in range(len(chars)):
+        if (u != len(chars) - 1):
+            rates.append(round(whole * rates_raw[u]))
+        else:
+            rates.append(whole - sum(rates))
+    c = [0]
+    for r in range(len(chars) - 1):
+        c.append(c[r] + rates[r])
+    d = [rates[0]]
+    for r in range(len(chars) - 1):
+        d.append(d[r] + rates[r + 1])
+
+    return dict, c, d
+
+def classical_get_the_arithmetic_encoding_of_a_word_with_eof(word, chars, rates_raw, bit_precision,dict,c,d):
+    whole = 2 ** bit_precision
+    return classical_zero_order_encoder_MC_with_eof(whole, word, c, d, dict)
+
+def classical_decode_zero_order_encoding_with_eof(bit_precision, encoding, dict,c,d,chars): # returns 0 if there is an error
+    whole = 2 ** bit_precision
+    encoding_copy=encoding.copy()
+
+    decoded_word, remaining_encoding=classical_decoder_with_eof(whole, encoding_copy, c, d, dict, chars, 0, whole, True, True, [], 1, 0, 0, True, 0, False, 0)
+
+
+
+
+    if decoded_word!=0:
+        return ''.join(decoded_word), remaining_encoding
+    else:
+        return 0, remaining_encoding
+
+def return_zero_order_hufmann_encoding_with_eof(chars, rates_raw):
+    rates_raw_copy=rates_raw.copy()
+    freq = {}
+    for o in range(len(chars)):
+        freq.update({chars[o]: rates_raw_copy[o]})
+    freq = sorted(freq.items(), key=lambda x: x[1], reverse=True)
+    node = make_tree(freq)
+    encoding = huffman_code_tree(node)
+
+    return encoding
+
+def encode_a_word_zero_order_hufmann_with_eof(encoding, word):
+    string = word
+    encoded = ""
+    for k in range(len(string)):
+        encoded += str(encoding[string[k]])
+
+    returned=[]
+    for t in range(len(encoded)):
+        returned.append(int(encoded[t]))
+    return returned
+
+def zero_order_hufmann_decoder_with_eof(encoding, bit_seqeunce,chars):
+    string_to_be_returned=''
+
+    while (True):
+
+
+        bulundumu=False
+        for key in encoding:
+
+            current_check=encoding[key]
+            a=len(current_check)
+
+
+            if (len(bit_seqeunce)>=a):
+                number = 0
+                for c in range(a):
+                    if str(bit_seqeunce[c])==current_check[c]:
+                        number+=1
+
+                if (number==a):
+                    string_to_be_returned+=key
+                    bit_seqeunce=bit_seqeunce[a:]
+                    bulundumu=True
+                    if key==chars[len(chars)-1]:
+                        bulundumu=False
+                    break
+        if (not bulundumu):
+            break
+
+    return string_to_be_returned
+
+def word_arithmetic_coder_suitability_checker_with_eof_classical(word, encoding, bit_precision, dict,c,d,chars):
+    trial1=encoding.copy()+[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] # maximum case
+    trial2=encoding.copy()+[] # minimum case
+
+
+
+    word1,x=classical_decode_zero_order_encoding_with_eof(bit_precision, trial1, dict,c,d,chars)
+    word2, y=classical_decode_zero_order_encoding_with_eof(bit_precision, trial2, dict,c,d,chars)
+
+
+    if (word1==word and word2==word):
+
+
+        return 0 # can be encoded by arithmetic
+    else:
+        return 1 # must be encoded by huffmann
+
