@@ -1,38 +1,88 @@
-"""
-Copyright 2023 Melih Şahin
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
-
-
+import sys
+import random
 main_condition=False
-
+sys.setrecursionlimit(25000)
 
 golden_ratio=0.6180339887498948482045868343656381177203091798057628621354486227
 
 
 
+
+# Hufmann Coding, written by ChatGPT, modified by me
+
+class NodeTree(object):
+    def __init__(self, left=None, right=None):
+        self.left = left
+        self.right = right
+
+    def children(self):
+        return self.left, self.right
+
+    def __str__(self):
+        return self.left, self.right
+
+
+def huffman_code_tree(node, binString=''):
+    '''
+    Function to find Huffman Code
+    '''
+    if type(node) is str:
+        return {node: binString}
+    (l, r) = node.children()
+    d = {}
+    d.update(huffman_code_tree(l, binString + '10'))
+    d.update(huffman_code_tree(r, binString + '0'))
+    return d
+
+
+def make_tree(nodes):
+    '''
+    Function to make tree
+    :param nodes: Nodes
+    :return: Root of the tree
+    '''
+    while len(nodes) > 1:
+        (key1, c1) = nodes[-1]
+        (key2, c2) = nodes[-2]
+        nodes = nodes[:-2]
+        node = NodeTree(key1, key2)
+        nodes.append((node, c1 + c2))
+        nodes = sorted(nodes, key=lambda x: x[1], reverse=True)
+    return nodes[0][0]
+
+def MC_Huffmann_encoder(word, chars, rates_raw_copy):
+    freq={}
+
+
+    for o in range(len(chars)):
+        freq.update({chars[o]:rates_raw_copy[o]})
+
+
+    string=word
+
+    freq = sorted(freq.items(), key=lambda x: x[1], reverse=True)
+
+
+    node = make_tree(freq)
+
+    encoding = huffman_code_tree(node)
+    encoded=""
+    for k in range(len(string)):
+        encoded+=str(encoding[string[k]])
+    return encoded
+# end of MC Huffmann coding
+
 def one_time_last_character_encoder_MC_without_EOF( whole, c, d, dict,s,a,b,the_character,altta_0_mı_var,ustte_1_mi_var,s_üst,s_alt  ):
     kaç_tane_bit_eklendi=0
-    half = whole / 2
-    quarter = whole / 4
+    half = whole // 2
+    quarter = whole // 4
 
-    zero_length = round(golden_ratio * whole)
+    zero_length = round((6180339887498948482045868343656381177203091798057628621354486227 * whole)//10000000000000000000000000000000000000000000000000000000000000000)
     one_length = whole - zero_length
 
     emit = []
-
-    while (True):
+    cond1=True
+    while (cond1):
 
             if ((not altta_0_mı_var) and (not ustte_1_mi_var)):
 
@@ -88,18 +138,66 @@ def one_time_last_character_encoder_MC_without_EOF( whole, c, d, dict,s,a,b,the_
                     ustte_1_mi_var = True
 
                 else:
-                    if (s>0):
+                    alt_uzunluk=one_length-a
+                    üst_uzunluk=b-one_length
 
-                        emit.append(s_üst)
+                    if (üst_uzunluk>alt_uzunluk):
+                        if (s > 0):
 
-                        for t in range(s - 1):
-                            emit.append(0)
+                            emit.append(s_üst)
 
-                        s = 0
+                            for t in range(s - 1):
+                                emit.append(0)
 
-                    emit.append(0)
-                    kaç_tane_bit_eklendi+=1
-                    break
+                            s = 0
+                        emit.append(0)
+                        kaç_tane_bit_eklendi += 1
+
+                        a = 0
+                        b = int(((b - one_length) * (zero_length)) / one_length)
+
+                        while(True):
+                            if (b>=zero_length):
+                                cond1=False
+                                break
+                            else:
+                                emit.append(0)
+                                b=int((b*whole)/zero_length)
+                        break
+
+                    else:
+                        if (s > 0):
+
+                            emit.append(s_alt)
+
+                            new_commute = 1
+                            if (s_alt == 1):
+                                new_commute = 0
+
+                            for t in range(s - 1):
+                                if (t % 2 == 0):
+                                    emit.append(new_commute)
+
+
+                                else:
+                                    emit.append(s_alt)
+                            s = 0
+
+                        emit.append(1)
+                        emit.append(0)
+                        kaç_tane_bit_eklendi += 2
+                        a = int((a * (whole)) / one_length)
+                        b = whole
+
+                        while(True):
+                            if (a<0):
+                                cond1=False
+                                break
+                            else:
+                                a = int(((a - zero_length) * (whole)) / one_length)
+                                emit.append(1)
+                                emit.append(0)
+                        break
 
             elif (altta_0_mı_var and (not ustte_1_mi_var)):
                 if (a>=half):
@@ -112,6 +210,7 @@ def one_time_last_character_encoder_MC_without_EOF( whole, c, d, dict,s,a,b,the_
                         s = 0
 
                     emit.append(0)
+                    kaç_tane_bit_eklendi += 1
 
                     a = 2 * (a - half)
                     b = 2 * (b - half)
@@ -137,6 +236,7 @@ def one_time_last_character_encoder_MC_without_EOF( whole, c, d, dict,s,a,b,the_
                         s=0
 
                     emit.append(0)
+                    kaç_tane_bit_eklendi += 1
 
 
 
@@ -147,43 +247,125 @@ def one_time_last_character_encoder_MC_without_EOF( whole, c, d, dict,s,a,b,the_
                     ustte_1_mi_var = True
 
                 else:
-                    if (s > 0):
-                        emit.append(s_üst)
+                    üst_uzunluk=b-half
+                    alt_uzunluk=half-a
+
+                    if (üst_uzunluk>alt_uzunluk):
+                        if (s > 0):
+                            emit.append(s_üst)
+
+                            for t in range(s - 1):
+                                emit.append(0)
+
+                            s = 0
+
+                        emit.append(0)
+                        kaç_tane_bit_eklendi += 1
+
+                        a = 0
+                        b = 2 * (b - half)
+
+                        while (True):
+
+                            if (b >= zero_length):
+                                cond1 = False
+                                break
+                            else:
+                                emit.append(0)
+                                b = int((b * whole) / zero_length)
+
+                        break
+
+
+                    else:
+                        emit.append(s_alt)
+
+                        new_commute = 1
+                        if (s_alt == 1):
+                            new_commute = 0
 
                         for t in range(s - 1):
-                            emit.append(0)
+                            if (t % 2 == 0):
+                                emit.append(new_commute)
 
+
+                            else:
+                                emit.append(s_alt)
                         s = 0
 
                     emit.append(0)
+
+                    a = 2 * a
+                    b = whole
+
+                    while (True):
+                        if (a < 0):
+                            cond1 = False
+                            break
+                        else:
+                            a = int(((a - zero_length) * (whole)) / one_length)
+                            emit.append(1)
+                            emit.append(0)
                     break
+
             elif (altta_0_mı_var and ustte_1_mi_var):
                 # here, s must always be 0
                 if (a>=zero_length):
                     emit.append(1)
                     emit.append(0)
+                    kaç_tane_bit_eklendi += 2
                     a = int( ((a - zero_length) * (whole)) / one_length)
                     b = int(((b - zero_length) * (whole)) / one_length)
 
                 elif (b<zero_length):
                     emit.append(0)
+                    kaç_tane_bit_eklendi += 1
                     a = int((a * (whole)) / zero_length)
                     b = int((b * (whole)) / zero_length)
 
                 else:
-                    emit.append(1)
-                    emit.append(0)
-                    break
+                    üst_uzunluk=b-zero_length
+                    alt_uzunluk=zero_length-a
+                    if (üst_uzunluk>alt_uzunluk):
+                        emit.append(1)
+                        emit.append(0)
+                        a = 0
+                        b = int(((b - zero_length) * (whole)) / one_length)
+
+                        while(True):
+                            if (b>=zero_length):
+                                cond1=False
+                                break
+                            else:
+                                emit.append(0)
+                                b = int((b * (whole)) / zero_length)
+                        break
+
+
+                    else:
+                        emit.append(0)
+                        a = int((a * (whole)) / zero_length)
+                        b = whole
+
+                        while(True):
+                            if (a<0):
+                                cond1=False
+                                break
+                            else:
+                                emit.append(1)
+                                emit.append(0)
+                                a = int(((a - zero_length) * (whole)) / one_length)
+                        break
 
     return emit, kaç_tane_bit_eklendi
 
 
 def one_time_encoder_MC( whole, c, d, dict,s,a,b,the_character,altta_0_mı_var,ustte_1_mi_var,s_üst,s_alt  ):
 
-    half=whole/2
+    half=int(whole/2)
     quarter=whole/4
 
-    zero_length = round(golden_ratio * whole)
+    zero_length = round((6180339887498948482045868343656381177203091798057628621354486227 * whole)//10000000000000000000000000000000000000000000000000000000000000000)
     one_length = whole - zero_length
 
     emit=[]
@@ -405,7 +587,7 @@ def one_time_encoder_MC( whole, c, d, dict,s,a,b,the_character,altta_0_mı_var,u
         condition = True
         while (condition):
             if (altta_0_mı_var and ustte_1_mi_var):
-                special_number=int((whole*golden_ratio)*golden_ratio)
+                special_number=int(((whole*6180339887498948482045868343656381177203091798057628621354486227)*6180339887498948482045868343656381177203091798057628621354486227)//(10000000000000000000000000000000000000000000000000000000000000000**2))
                 if (a >= special_number):
                     condition = True
                     a = int(((a - special_number) * (whole)) / (whole - special_number))
@@ -426,7 +608,7 @@ def one_time_encoder_MC( whole, c, d, dict,s,a,b,the_character,altta_0_mı_var,u
                     condition = False
 
             if ((not altta_0_mı_var) and (not ustte_1_mi_var)):
-                special_number_1 = round((whole * 2 * golden_ratio) * golden_ratio)  # 801041=whole*(2*(phi*phi))
+                special_number_1 = round(((whole * 2 * 6180339887498948482045868343656381177203091798057628621354486227) * 6180339887498948482045868343656381177203091798057628621354486227)//(10000000000000000000000000000000000000000000000000000000000000000**2))  # 801041=whole*(2*(phi*phi))
                 if (b < special_number_1):  # 801041=whole*(2*(phi*phi))
                     a = int((a * (whole)) / special_number_1)
                     b = int((b * (whole)) / special_number_1)
@@ -446,8 +628,8 @@ def one_time_encoder_MC( whole, c, d, dict,s,a,b,the_character,altta_0_mı_var,u
                     condition = False
 
             if (altta_0_mı_var and (not ustte_1_mi_var)):
-                special_number_2 = round((whole / 2) * (1 + golden_ratio))
-                special_number_3 = round((whole / 2) * golden_ratio)  # ((324028=whole/2)*phi)
+                special_number_2 = round(((whole // 2) * (10000000000000000000000000000000000000000000000000000000000000000 + 6180339887498948482045868343656381177203091798057628621354486227))//10000000000000000000000000000000000000000000000000000000000000000)
+                special_number_3 = round(((whole // 2) * 6180339887498948482045868343656381177203091798057628621354486227)//10000000000000000000000000000000000000000000000000000000000000000)  # ((324028=whole/2)*phi)
                 if (b < special_number_2 and a >= special_number_3):
                     condition = True
                     a = int(((a - special_number_3) * (whole)) / (whole / 2))
@@ -475,7 +657,7 @@ def one_time_encoder_MC( whole, c, d, dict,s,a,b,the_character,altta_0_mı_var,u
 def decoder(whole, sequence, c, d, dict, chars, number, number_finish, altta_0_mı_var, ustte_1_mi_var,the_seqeunce, s_üst, s_alt, s, is_s_0,toplam_emit,main_condition,kaçıncı,bir_önceki_bit):
 
     #print(''.join(the_seqeunce))
-    zero_length = round(golden_ratio * whole)
+    zero_length = round((6180339887498948482045868343656381177203091798057628621354486227 * whole)//10000000000000000000000000000000000000000000000000000000000000000)
     one_length = whole - zero_length
 
     the_character=0
@@ -522,7 +704,7 @@ def decoder(whole, sequence, c, d, dict, chars, number, number_finish, altta_0_m
 
 
 
-    final_number=(number_now+number_now)/2
+    final_number=(number_finish_now+number_now)/2
 
     checkher=True
 
@@ -568,10 +750,10 @@ def decoder(whole, sequence, c, d, dict, chars, number, number_finish, altta_0_m
 def zero_order_encoder_MC_without_eof( whole, word, c, d, dict):
     a=0
     b=whole
-    half=whole/2
+    half=int(whole/2)
     quarter=whole/4
     s=0
-    zero_length = round(golden_ratio * whole)
+    zero_length = round((6180339887498948482045868343656381177203091798057628621354486227 * whole)//10000000000000000000000000000000000000000000000000000000000000000)
     one_length = whole - zero_length
     altta_0_mı_var=True
     ustte_1_mi_var=True
@@ -587,6 +769,21 @@ def zero_order_encoder_MC_without_eof( whole, word, c, d, dict):
     emit+=emit_new
     return emit
 
+
+def random_zero_order_text_generator_without_eof(chars, rates_raw, word_length):
+    d = [rates_raw[0]]
+    for r in range(len(rates_raw) - 1):
+        d.append(d[r] + rates_raw[r + 1])
+    the_word=[]
+    for t in range(word_length):
+        sayı = random.uniform(0, 1)
+        the_char = 0
+        for j in range(len(d)):
+            if sayı<=d[j]:
+                the_char=chars[j]
+                break
+        the_word.append(the_char)
+    return "".join(the_word)
 
 def zero_order_dict_c_d_returner(chars, rates_raw, bit_precision):
     whole = 2 ** bit_precision
@@ -623,7 +820,27 @@ def decode_zero_order_encoding_without_eof(bit_precision, encoding, dict,c,d,cha
     return ''.join(decoded_word)
 
 
+def return_zero_order_hufmann_encoding_without_eof(chars, rates_raw):
+    rates_raw_copy=rates_raw.copy()
+    freq = {}
+    for o in range(len(chars)):
+        freq.update({chars[o]: rates_raw_copy[o]})
+    freq = sorted(freq.items(), key=lambda x: x[1], reverse=True)
+    node = make_tree(freq)
+    encoding = huffman_code_tree(node)
 
+    return encoding
+
+def encode_a_word_zero_order_hufmann_without_eof(encoding, word):
+    string = word
+    encoded = ""
+    for k in range(len(string)):
+        encoded += str(encoding[string[k]])
+
+    returned=[]
+    for t in range(len(encoded)):
+        returned.append(int(encoded[t]))
+    return returned
 
 def word_arithmetic_coder_suitability_checker_without_eof(word, encoding, bit_precision, dict,c,d,chars):
 
@@ -635,6 +852,10 @@ def word_arithmetic_coder_suitability_checker_without_eof(word, encoding, bit_pr
     if (word2==word):
         return 0 # can be encoded by arithmetic
     else:
+        print("*****")
+        print(word)
+        print(word2)
+
         return 1 # must be encoded by huffmann
 
 
