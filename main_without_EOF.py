@@ -26,6 +26,9 @@ exemplary_word="GTAACGTAGTATTATGTAAA"
 arithmetic_encoding=get_the_arithmetic_encoding_of_a_word_without_eof(exemplary_word, chars, rates, bit_precision,dict,c,d)
 decoded_word=decode_zero_order_encoding_without_eof(bit_precision, arithmetic_encoding, dict,c,d,chars)
 
+print("print True if can be encoded by MoAC")
+print(word_arithmetic_coder_suitability_checker_without_eof(exemplary_word,arithmetic_encoding,bit_precision,dict,c,d,chars))
+
 print("encoded word is "+exemplary_word)
 print("its encoding is: ")
 print(arithmetic_encoding)
